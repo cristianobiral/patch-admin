@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:adm="http://github.com/adminfaces"
+	template="#{layoutMB.template}">
+
+	<ui:define name="head-end">
+		<style type="text/css">
+		.ui-datatable .ui-datatable-header {
+			text-align: right !important;
+		}
+		
+		th.ui-filter-column {
+			padding: 5px 2px !important;
+		}
+		
+		#footer:hover {
+			opacity: .7;
+		}
+		
+		#footer {
+			float: right;
+			font-size: 12px;
+			color: #3c8dbc;
+			font-weight: 500;
+		}
+		
+		.ui-datatable-footer {
+			border: none;
+		}
+		</style>
+	</ui:define>
+
+	<ui:define name="body-begin">
+		<ui:param name="title" value="Listagem de Áreas" />
+	</ui:define>
+
+	<ui:define name="description">
+        Pesquise áreas pelo id ou nome
+    </ui:define>
+
+	<ui:define name="body">
+		<h:form>
+			<div class="box box-primary">
+				<div class="box-header with-border">
+					<div id="main-buttons" class="hidden-sm hidden-xs">
+						<p:commandButton action="mantem-area-form?faces-redirect=true"
+							icon="fa fa-plus" value="Novo" styleClass="btn-primary" />
+						<p:spacer width="5" />
+						<p:commandButton value="Excluir selecionados" icon="fa fa-trash"
+							styleClass="btn-danger" action="#{mantemAreaListMB.exclui}"
+							disabled="#{empty mantemAreaListMB.selectionList or mantemAreaListMB.selectionList.size() == 0}"
+							process="@this" update="@form">
+							<p:confirm header="Confirmação" message="Tem certeza?" icon="ui-icon-danger" />
+						</p:commandButton>
+						<p:spacer width="5" />
+						<p:commandButton value="Pesquisar" update="@(.ui-dialog)"
+							styleClass="btn-info" oncomplete="PF('searchDialog').show()"
+							icon="fa fa-search" />
+						<p:spacer width="5" />
+						<p:commandButton value="Limpar"
+							update="@(.ui-dialog, .ui-datatable)" process="@form"
+							action="#{mantemAreaListMB.clear}" icon="fa fa-refresh" />
+					</div>
+
+					<p:splitButton value="Novo" action="mantem-area-form?faces-redirect=true"
+						icon="fa fa-plus" styleClass="hidden-md hidden-lg btn-primary">
+						<p:menuitem value="Excluir selecionados" action="#{mantemAreaListMB.exclui}"
+							process="@this" update="@form"
+							disabled="#{empty mantemAreaListMB.selectionList or mantemAreaListMB.selectionList.size() == 0}"
+							icon="fa fa-trash">
+							<p:confirm header="Confirmação" message="Tem certeza?"
+								icon="ui-icon-danger" />
+						</p:menuitem>
+						<p:menuitem value="Pesquisar" update="@(.ui-dialog)"
+							oncomplete="PF('searchDialog').show()" icon="fa fa-search" />
+						<p:menuitem value="Limpar" update="@(.ui-dialog, .ui-datatable)"
+							process="@form" action="#{mantemAreaListMB.clear}" icon="fa fa-refresh" />
+					</p:splitButton>
+					
+					<p:separator />
+					
+					<p:dataTable widgetVar="dataTable" var="e"
+						value="#{mantemAreaListMB.list}" rows="5" rowKey="#{e.id}" lazy="true"
+						paginator="true" filteredValue="#{mantemAreaListMB.filteredValue}"
+						paginatorPosition="bottom" selection="#{mantemAreaListMB.selectionList}"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown} {JumpToPageDropdown}"
+						currentPageReportTemplate="[ {startRecord} à {endRecord} de {totalRecords} ]"
+						emptyMessage="nenhum registro encontrado"
+						rowsPerPageTemplate="5,10,15,20,30">
+
+						<p:ajax event="rowSelectCheckbox" update="@(.ui-button, .ui-confirm-dialog)" />
+						<p:ajax event="rowUnselectCheckbox" update="@(.ui-button, .ui-confirm-dialog)" />
+						<p:ajax event="rowSelect" update="@(.ui-button, .ui-confirm-dialog)" />
+						<p:ajax event="rowUnselect" update="@(.ui-button, .ui-confirm-dialog)" />
+
+						<f:facet name="header">
+                            buscar por id: <p:inputNumber id="inptId" decimalPlaces="0" value="#{mantemAreaListMB.id}" />
+							<p:spacer height="5" />
+							<p:commandButton id="brFind" value="Buscar"
+								action="#{mantemAreaListMB.buscaPorId(mantemAreaListMB.id)}" process="@form"
+								update="@form" styleClass="btn-flat bg-black"
+								partialSubmit="true" />
+						</f:facet>
+						
+						<p:column selectionMode="multiple" width="5%"
+							styleClass="align-center" />
+						<p:column headerText="Id" sortBy="#{e.id}" filterBy="#{e.id}" width="15%">
+							<f:facet name="filter">
+								<p:inputText value="#{mantemAreaListMB.filter.entity.id}">
+									<p:ajax process="@this" update="@none"
+										oncomplete="PF('dataTable').filter()" />
+								</p:inputText>
+							</f:facet>
+                            #{e.id}
+                        </p:column>
+						<p:column headerText="Nome" sortBy="#{e.nome}" filterBy="#{e.nome}">
+							<f:facet name="filter">
+								<p:inputText value="#{mantemAreaListMB.filter.entity.nome}">
+									<p:ajax process="@this" update="@none"
+										oncomplete="PF('dataTable').filter()" />
+								</p:inputText>
+							</f:facet>
+                            #{e.nome}
+                        </p:column>
+                        
+						<f:facet name="footer">
+							<div id="footer">
+								critérios de busca <i class="fa fa-filter" />
+							</div>
+						</f:facet>
+					</p:dataTable>
+				</div>
+			</div>
+			
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+				styleClass="box-danger">
+				<p:commandButton value="Sim" type="button"
+					styleClass="btn-primary ui-confirmdialog-yes" icon="fa fa-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="btn-danger ui-confirmdialog-no" icon="fa fa-close" />
+			</p:confirmDialog>
+		</h:form>
+
+		<p:dialog header="Áreas encontradas" widgetVar="searchDialog" height="400"
+			modal="true" appendTo="@(body)" width="500" responsive="true"
+			draggable="false" styleClass="box-success">
+			<h:form>
+				<p:commandButton value="OK"
+					update="@form @(.ui-datatable, .ui-tooltip)" icon="fa fa-check"
+					ignoreAutoUpdate="true" styleClass="btn-primary" />
+				<p:spacer height="5" />
+				<p:commandButton value="Limpar" action="#{mantemAreaListMB.clear}"
+					process="@this" update="@form @(.ui-datatable, .ui-tooltip)"
+					styleClass="btn-success" icon="fa fa-refresh" />
+				<p:spacer height="5" />
+				<p:commandButton value="Fechar" icon="fa fa-close"
+					oncomplete="PF('searchDialog').hide()" />
+				<p:separator />
+
+				<div class="ui-g ui-fluid">
+					<div class="ui-g-12">
+						<p:outputLabel for="nome" value="#{msg['label.nome']}" />
+					</div>
+					<div class="ui-g-12">
+						<p:inputText id="nome" value="#{mantemAreaListMB.filter.entity.nome}" />
+					</div>
+				</div>
+			</h:form>
+		</p:dialog>
+
+		<p:outputPanel autoUpdate="true">
+			<p:tooltip for="@(div[id$=footer])" escape="false" position="top"
+				showEvent="mouseover" hideEvent="mouseleave"
+				value="#{mantemAreaListMB.searchCriteria}" />
+		</p:outputPanel>
+	</ui:define>
+</ui:composition>
