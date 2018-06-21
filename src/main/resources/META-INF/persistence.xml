@@ -6,7 +6,7 @@
     <persistence-unit name="PatchAdminDS" transaction-type="JTA">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		
-        <jta-data-source>java:/PostgresDS</jta-data-source>
+        <jta-data-source>java:/PatchAdminDS</jta-data-source>
     	
     	<class>br.com.miracleworks.patchadmin.model.Area</class>
     	<class>br.com.miracleworks.patchadmin.model.Carcaca</class>
